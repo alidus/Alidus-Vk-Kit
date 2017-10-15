@@ -122,27 +122,28 @@ class Program:
         return result
 
     def show_dialogs(self, print_d=True):
-        dialogs = self.vkapi.messages.getDialogs(count=200)
+        dialogs = self.vkapi.messages.getDialogs(count=10)[1:]
+        print(dialogs)
         help_var = 1
         for dialog in dialogs:
-            try:
-                if dialog['users_count']:
-                    # admin_id, date, users_count
-                    if print_d:
-                        print("%d) %s" % (help_var, dialog['title']))
-                        print("   Кол-во участников: " + str(dialog['users_count']))
-                    help_var += 1
-                    try:
-                        if print_d:
-                            hey = self.vkapi.users.get(user_ids=dialog['admin_id'])[0]
-                            print("   Создатель: " + hey['first_name'] + ' ' + hey['last_name'])
-                    except Exception:
-                        pass
-                    if print_d:
-                        print()
-                    self.list_of_multidialogs.append(dialog)
-            except Exception:
-                pass
+            if 'users_count' in dialog:
+                # admin_id, date, users_count
+                if print_d:
+                    print("%d) %s" % (help_var, dialog['title']))
+                    print("   Кол-во участников: " + str(dialog['users_count']))
+                    hey = self.vkapi.users.get(user_ids=dialog['admin_id'])[0]
+                    print("   Создатель: " + hey['first_name'] + ' ' + hey['last_name'])
+
+                
+            elif int(dialog['uid']) > 0:
+                user = self.vkapi.users.get(user_ids=dialog['uid'])[0]
+                if print_d:
+                    print("%d) %s %s" % (help_var, user['first_name'], user['last_name']))
+
+            self.list_of_multidialogs.append(dialog)
+            help_var += 1
+            time.sleep(0.33)
+
 
     def select_program(self):
         """Allow user select base program scenario"""
@@ -320,11 +321,17 @@ class Program:
         return counter
 
     def get_dialog_data(self, dialog, start_from=None, dialog_number=None):
+        peer_id = None
+        if 'chat_id' in dialog:
+            peer_id = 2000000000 + dialog['chat_id']
+        elif int(dialog['uid']) > 0:
+            peer_id = dialog['uid']
+
         if not start_from:
-            photo_array = self.vkapi.messages.getHistoryAttachments(peer_id=2000000000 + dialog['chat_id'],
+            photo_array = self.vkapi.messages.getHistoryAttachments(peer_id=peer_id,
                                                                     media_type='photo', count=200)
         else:
-            photo_array = self.vkapi.messages.getHistoryAttachments(peer_id=2000000000 + dialog['chat_id'],
+            photo_array = self.vkapi.messages.getHistoryAttachments(peer_id=peer_id,
                                                                     media_type='photo', count=200, start_from=start_from)
 
         print('.', end='', flush=True)
