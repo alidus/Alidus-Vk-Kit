@@ -122,8 +122,7 @@ class Program:
         return result
 
     def show_dialogs(self, print_d=True):
-        dialogs = self.vkapi.messages.getDialogs(count=10)[1:]
-        print(dialogs)
+        dialogs = self.vkapi.messages.getDialogs(count=200)[1:]
         help_var = 1
         for dialog in dialogs:
             if 'users_count' in dialog:
