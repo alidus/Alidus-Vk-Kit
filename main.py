@@ -10,7 +10,7 @@ import numpy
 class Program:
     """ Main program class """
     def __init__(self):
-        self.alphabet = tuple(list(string.ascii_lowercase) +
+        self.alphabet = tuple(list(string.ascii_lowercase) + list(string.ascii_uppercase) +
         [str(x) for x in range(0, 10)] + ['@', '.'])  # alphabet (a-z)+(1-9)
         self.tag = None                 # tag for vk user search
         self.coll = None                # collection for Mongo DB
@@ -99,7 +99,7 @@ class Program:
     def encrypt(self, string):
         result = ''
         decryption_key = ''
-        for letter in string:
+        for letter in str(string):
             shift = random.randint(1, 9)
             new_index = self.alphabet.index(letter) + shift
             if new_index >= len(self.alphabet):
@@ -112,7 +112,7 @@ class Program:
         result = ''
         decryption_key = dec_key;
         iter = 0
-        for letter in string:
+        for letter in str(string):
             shift = int(decryption_key[iter])
             iter += 1
             original_index = self.alphabet.index(letter)-shift
